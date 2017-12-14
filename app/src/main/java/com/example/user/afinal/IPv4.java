@@ -3,10 +3,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.*;
 
-/**
- * Created by BHARATH P on 12/14/2017.
- */
-
 public class IPv4 {
     int baseIPnumeric;
     int netmaskNumeric;
