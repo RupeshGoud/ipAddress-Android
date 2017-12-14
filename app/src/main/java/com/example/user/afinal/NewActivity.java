@@ -64,16 +64,24 @@ public class NewActivity extends Activity {
                 if (r1.isChecked())
                 {
                     new_ipaddress=e5.getText().toString();
-                    String arr[]=new_split(new_ipaddress);
-                    final int[] ints=new int[arr.length];
-                    for(int i5=0;i5<arr.length;i5++)
+                    Log.d("enter","entered inside onclick inside radio of ipv4");
+                    String[] arr=new_split(new_ipaddress);
+                    int l =  arr.length;
+                    Log.d("enter",Integer.toString(l));
+                    //Log.d("enter", );
+                    int[] ints=new int[arr.length];
+                    Log.d("enter","entered inside onclick inside radio of ipv4      2");
+                    for(int i=0;i<arr.length;i++)
                     {
-                        ints[i5]=Integer.parseInt(arr[i5]);
+                        ints[i]=Integer.parseInt(arr[i]);
 
                     }
-                    int k=Integer.parseInt(e6.getText().toString());
-                    if((e6.getText().toString())==null)
+                    Log.d("enter","entered inside onclick inside radio of ipv4       3");
+                    //int k=Integer.parseInt(e6.getText().toString());
+                    Log.d("ipv4s",e6.getText().toString());
+                    if((e6.getText().toString()).equals(""))
                     {
+                        Log.d("enter","in e6(if)");
                         int set_cidr=setCidr(ints);
                         boolean x=  validate(e5.getText().toString());
                         String sb=findSubNetMask(ints);
@@ -109,8 +117,16 @@ public class NewActivity extends Activity {
 
                             }
                         }
-                            else {
-                            Toast.makeText(NewActivity.this, "IP IS NOT VALID", Toast.LENGTH_SHORT).show();
+
+                    }
+                    else{
+                        if((Integer.parseInt(e6.getText().toString()) < 10 || (Integer.parseInt(e6.getText().toString())) >30)){
+                            Toast.makeText(NewActivity.this, "Please enter beteen 10-30", Toast.LENGTH_SHORT).show();
+
+                        }else{
+                            IPv4 ipv4 = new IPv4(new_ipaddress+"/"+e6.getText().toString());
+                            t4.setText("Sub Net Mask:" + ipv4.getNetmask() + "\n");
+                            Toast.makeText(NewActivity.this, "Correct cidr", Toast.LENGTH_SHORT).show();
                         }
 
                     }
@@ -139,7 +155,7 @@ public class NewActivity extends Activity {
 
         String temp=ipaddress_1;
         int j=0;
-        String ipadd[]=new String[10];
+        String ipadd[]=new String[4];
         String delims=".";
         StringTokenizer st=new StringTokenizer(temp,delims);
         while(st.hasMoreTokens())
@@ -178,7 +194,7 @@ public class NewActivity extends Activity {
     public String findSubNetMask(int sbnm[])
     {
         String sbn="";
-        if(sbnm[0]>=1&&sbnm[0]<=168)
+        if(sbnm[0]>=1&&sbnm[0]<=126)
         {
             sbn="255.0.0.0";
         }
