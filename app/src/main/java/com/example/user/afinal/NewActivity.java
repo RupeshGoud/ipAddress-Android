@@ -133,17 +133,44 @@ public class NewActivity extends Activity {
 
 
                 }
-                else if(r2.isChecked())
-                {
-                    boolean y=validate2(e5.getText().toString());
-                    if(y==true)
-                    {
-                        Toast.makeText(NewActivity.this, "IP IS VALID", Toast.LENGTH_SHORT).show();
-                        t4.setText("Network Info\n");
+//                else if(r2.isChecked())
+//                {
+//                    boolean y=validate2(e5.getText().toString());
+//                    if(y==true)
+//                    {
+//                        Toast.makeText(NewActivity.this, "IP IS VALID", Toast.LENGTH_SHORT).show();
+//                        t4.setText("Network Info\n");
+//
+//                    }
+//                    else
+//                        Toast.makeText(NewActivity.this, "IP IS NOT VALID", Toast.LENGTH_SHORT).show();
+//                }
+                else if(r2.isChecked()) {
+                    new_ipaddress = e5.getText().toString();
+                    Log.d("enter", "entered inside onclick inside radio of ipv4");
+                    if ((e6.getText().toString()).equals("")) {
+                        boolean y = validate2(e5.getText().toString());
+                        if (y == true) {
+                            final IPv6Network strangeNetwork = IPv6Network.fromString(new_ipaddress);
+                            Toast.makeText(NewActivity.this, "IP IS VALID", Toast.LENGTH_SHORT).show();
+                            t4.setText("Sub Net Mask:" + strangeNetwork.getNetmask().asAddress() + "\n");
+
+                        } else {
+                            Toast.makeText(NewActivity.this, "IP IS NOT VALID", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                    else {
+                        if((Integer.parseInt(e6.getText().toString()) <  64)) {
+                            Toast.makeText(NewActivity.this, "Please enter greater than 64", Toast.LENGTH_SHORT).show();
+                        }
+                        else{
+                            new_ipaddress = e5.getText().toString()+"/"+Integer.parseInt(e6.getText().toString());
+                            final IPv6Network strangeNetwork = IPv6Network.fromString(new_ipaddress);
+                            t4.setText("Sub Net Mask:" + strangeNetwork.getNetmask().asAddress() + "\n");
+                            Toast.makeText(NewActivity.this, "Correct cidr", Toast.LENGTH_SHORT).show();
+                        }
 
                     }
-                    else
-                        Toast.makeText(NewActivity.this, "IP IS NOT VALID", Toast.LENGTH_SHORT).show();
                 }
             }
         });
