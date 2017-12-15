@@ -228,7 +228,6 @@ public class MainActivity extends AppCompatActivity {
             urlc.setConnectTimeout(10000);
             urlc.connect();
             return (urlc.getResponseCode() == 200);
-
         } catch (IOException e) {
             return false;
         }

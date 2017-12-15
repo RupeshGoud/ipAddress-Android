@@ -37,7 +37,7 @@
         android:checked="true"
         android:layout_toEndOf="@+id/radioButton"
         android:layout_toRightOf="@+id/radioButton"
-        android:text="IPv6 validation"
+        android:text="IPV6 Address"
         android:textColor="#154"
         android:textSize="20sp"
         android:textStyle="bold" />
@@ -66,7 +66,8 @@
         android:background="@drawable/textinputborder"
         android:ems="10"
         android:inputType="textPersonName"
-        android:text="" />
+        android:text=""
+        android:hint="  IP Address"/>
 
     <Button
         android:id="@+id/button4"
@@ -81,7 +82,7 @@
         android:shadowDx="0"
         android:shadowDy="0"
         android:shadowRadius="5"
-        android:text="@string/validateyourip"
+        android:text=" Validate Your IP "
         android:textColor="#FAFAFA"
         android:textSize="20sp" />
 
@@ -98,7 +99,9 @@
         android:background="@drawable/textinputborder"
         android:ems="10"
         android:inputType="number"
-        android:text="" />
+        android:text=""
+        android:hint="  CIDR"/>
+
 
 
 </RelativeLayout>
