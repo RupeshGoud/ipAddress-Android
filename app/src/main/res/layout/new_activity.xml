@@ -97,7 +97,7 @@
         android:layout_marginRight="18dp"
         android:background="@drawable/textinputborder"
         android:ems="10"
-        android:inputType="textPostalAddress"
+        android:inputType="number"
         android:text="" />
 
 
