@@ -202,9 +202,7 @@ public class NewActivity extends Activity {
 
 
     }
-    public static String[] new_split(String ipaddress_1)
-    {
-
+    public static String[] new_split(String ipaddress_1){
         String temp=ipaddress_1;
         int j=0;
         String ipadd[]=new String[4];

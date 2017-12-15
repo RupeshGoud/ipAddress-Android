@@ -14,11 +14,21 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.net.*;
+
+import java.io.IOException;
+import java.net.HttpURLConnection;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
+import java.net.URL;
+import java.net.UnknownHostException;
 import java.util.Enumeration;
 import java.util.regex.Pattern;
 import android.net.NetworkInfo.*;
+
+import org.apache.http.params.HttpConnectionParams;
+import org.apache.http.params.HttpParams;
+
+import static java.lang.Thread.sleep;
 
 public class MainActivity extends AppCompatActivity {
     Button b1;
@@ -65,6 +75,7 @@ public class MainActivity extends AppCompatActivity {
                 NetwordDetect();
                 if (IPaddress.equals("")){
                     t1.setText("Currently You are not connected to any network!!\nNo Internet connection.");
+                    t2.setText("");
                 }else {
                     if (validate(IPaddress) ){
                         String new_ipaddress = IPaddress;
@@ -78,12 +89,18 @@ public class MainActivity extends AppCompatActivity {
                         }
                         int set_cidr=NewActivity.setCidr(ints);
                         IPv4 ipv4 = new IPv4(new_ipaddress+"/"+Integer.toString(set_cidr));
-                        NetworkInfo ni = new NetworkInfo();
-
-                        if (ni.isAvailable()){
-                            t1.setText("IP Address is "+IPaddress);
-                        }else{
-                            t1.setText("Oops..!!!There is No Internet Connection" + "\n"+"IP Address is "+IPaddress);
+                        Log.d("before check","before check");
+                        try {
+                            if (isNetworkAvailable()){
+                                Log.d("before check","before check");
+                                t1.setText("IP Address is "+IPaddress);
+                            }else{
+                                Log.d("before check","before check");
+                                t1.setText("Oops..!!!There is No Internet Connection" + "\n"+"IP Address is "+IPaddress);
+                            }
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                            t1.setText("Exceptionm :::: Oops..!!!There is No Internet Connection" + "\n"+"IP Address is "+IPaddress);
                         }
 
                         //t2.setText("Sub Net Mask:" + ipv4.getNetmask() +"\n"+"BroadCast Address:"+ipv4.getBroadcastAddress()+ "\n");
@@ -91,9 +108,14 @@ public class MainActivity extends AppCompatActivity {
                     }else if (validate2(IPaddress)) {
                         String new_ipaddress = IPaddress+"/"+64;
                         IPv6Network strangeNetwork = IPv6Network.fromString(new_ipaddress);
-                        if (isNetworkAvailable()){
-                            t1.setText("IP Address is "+IPaddress);
-                        }else{
+                        try {
+                            if (isNetworkAvailable()){
+                                t1.setText("IP Address is "+IPaddress);
+                            }else{
+                                t1.setText("Oops..!!!There is No Internet Connection" + "\n"+"IP Address is "+IPaddress);
+                            }
+                        } catch (IOException e) {
+                            e.printStackTrace();
                             t1.setText("Oops..!!!There is No Internet Connection" + "\n"+"IP Address is "+IPaddress);
                         }
 
@@ -101,9 +123,6 @@ public class MainActivity extends AppCompatActivity {
 
                     }
                 }
-
-
-
             }
         });
         b2.setOnClickListener(new View.OnClickListener() {
@@ -112,7 +131,6 @@ public class MainActivity extends AppCompatActivity {
                 Intent myIntent = new Intent(MainActivity.this,
                         NewActivity.class);
                 startActivity(myIntent);
-
             }
         });
         b3.setOnClickListener(new View.OnClickListener() {
@@ -122,59 +140,30 @@ public class MainActivity extends AppCompatActivity {
                 Log.i("Video","Video Playing");
             }
         });
-
     }
-
-
-    //Check the internet connection.
     private void NetwordDetect() {
-
         boolean WIFI = false;
-
         boolean MOBILE = false;
-
         ConnectivityManager CM = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-
         NetworkInfo[] networkInfo = CM.getAllNetworkInfo();
-
         for (NetworkInfo netInfo : networkInfo) {
-
             if (netInfo.getTypeName().equalsIgnoreCase("WIFI"))
-
                 if (netInfo.isConnected())
-
                     WIFI = true;
-
             if (netInfo.getTypeName().equalsIgnoreCase("MOBILE"))
-
                 if (netInfo.isConnected())
-
                     MOBILE = true;
         }
-
-        if(WIFI == true)
-
-        {
+        if(WIFI == true) {
             IPaddress = GetDeviceipWiFiData();
-
-
-
         }
-
-        if(MOBILE == true)
-        {
-
+        if(MOBILE == true) {
             IPaddress = GetDeviceipMobileData();
-
-
         }
         if (WIFI== false && MOBILE== false){
             IPaddress = "";
         }
-
     }
-
-
     public String GetDeviceipMobileData(){
         try {
             for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces();
@@ -192,29 +181,56 @@ public class MainActivity extends AppCompatActivity {
         }
         return null;
     }
-    public boolean isNetworkAvailable() {
+    public boolean isNetworkAvailable() throws IOException {
         ConnectivityManager connectivityManager
                 = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
-        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+        if (activeNetworkInfo != null && activeNetworkInfo.isConnectedOrConnecting()) {
+            Log.d("before check","4");
+            if(isOnline()){
+                return true;
+            }else{
+                return false;
+            }
+        }
+        return false;
     }
-    public String GetDeviceipWiFiData()
-    {
-
+    public String GetDeviceipWiFiData() {
         WifiManager wm = (WifiManager) getApplicationContext().getSystemService(WIFI_SERVICE);
-
         @SuppressWarnings("deprecation")
-
         String ip = Formatter.formatIpAddress(wm.getConnectionInfo().getIpAddress());
-
         return ip;
-
     }
     public static boolean validate( String ip) {
         return PATTERN.matcher(ip).matches();
     }
-    public static boolean validate2( String ip){return PATTERN2.matcher(ip).matches();}
+    public static boolean validate2( String ip){
+        return PATTERN2.matcher(ip).matches();
+    }
+    public Boolean isOnline() {
+        try {
+            Process p1 = java.lang.Runtime.getRuntime().exec("ping -c 1 www.google.com");
+            Log.d("before check","2");
+            int returnVal = p1.waitFor();
+            Log.d("before check wait for",Integer.toString(p1.waitFor()));
+            boolean reachable = (returnVal==0);
+            return reachable;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+    public static boolean connectGoogle() {
+        try {
+            HttpURLConnection urlc = (HttpURLConnection)(new URL("http://www.google.com").openConnection());
+            urlc.setRequestProperty("User-Agent", "Test");
+            urlc.setRequestProperty("Connection", "close");
+            urlc.setConnectTimeout(10000);
+            urlc.connect();
+            return (urlc.getResponseCode() == 200);
 
-
-
+        } catch (IOException e) {
+            return false;
+        }
+    }
 }
