@@ -17,6 +17,9 @@ import android.net.*;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.util.Enumeration;
+import java.util.regex.Pattern;
+import android.net.NetworkInfo.*;
+
 public class MainActivity extends AppCompatActivity {
     Button b1;
     Button b2;
@@ -26,6 +29,21 @@ public class MainActivity extends AppCompatActivity {
     TextView t3;
     String IPaddress;
     Boolean IPValue;
+    static final Pattern PATTERN = Pattern.compile(
+            "^(([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.){3}([01]?\\d\\d?|2[0-4]\\d|25[0-5])$");
+    static final Pattern PATTERN2 = Pattern.compile("^((([0-9A-Fa-f]{1,4}:){7}[0-9A-Fa-f]{1,4})|" +
+            "(([0-9A-Fa-f]{1,4}:){6}:[0-9A-Fa-f]{1,4})|(([0-9A-Fa-f]{1,4}:){5}:([0-9A-Fa-f]{1,4}:)?[0-9A-Fa-f]{1,4})|" +
+            "(([0-9A-Fa-f]{1,4}:){4}:([0-9A-Fa-f]{1,4}:){0,2}[0-9A-Fa-f]{1,4})|" +
+            "(([0-9A-Fa-f]{1,4}:){3}:([0-9A-Fa-f]{1,4}:){0,3}[0-9A-Fa-f]{1,4})|" +
+            "(([0-9A-Fa-f]{1,4}:){2}:([0-9A-Fa-f]{1,4}:){0,4}[0-9A-Fa-f]{1,4})|" +
+            "(([0-9A-Fa-f]{1,4}:){6}((\\b((25[0-5])|(1\\d{2})|(2[0-4]\\d)|" +
+            "(\\d{1,2}))\\b)\\.){3}(\\b((25[0-5])|(1\\d{2})|(2[0-4]\\d)|(\\d{1,2}))\\b))|" +
+            "(([0-9A-Fa-f]{1,4}:){0,5}:((\\b((25[0-5])|(1\\d{2})|(2[0-4]\\d)|" +
+            "(\\d{1,2}))\\b)\\.){3}(\\b((25[0-5])|(1\\d{2})|(2[0-4]\\d)|(\\d{1,2}))\\b))|" +
+            "(::([0-9A-Fa-f]{1,4}:){0,5}((\\b((25[0-5])|(1\\d{2})|" +
+            "(2[0-4]\\d)|(\\d{1,2}))\\b)\\.){3}(\\b((25[0-5])|(1\\d{2})|(2[0-4]\\d)|" +
+            "(\\d{1,2}))\\b))|([0-9A-Fa-f]{1,4}::([0-9A-Fa-f]{1,4}:){0,5}[0-9A-Fa-f]{1,4})|" +
+            "(::([0-9A-Fa-f]{1,4}:){0,6}[0-9A-Fa-f]{1,4})|(([0-9A-Fa-f]{1,4}:){1,7}:))$");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,6 +55,7 @@ public class MainActivity extends AppCompatActivity {
         t1=(TextView)findViewById(R.id.textView);
         t2=(TextView)findViewById(R.id.textView2);
         t3=(TextView)findViewById(R.id.textView3);
+
         b1.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -44,6 +63,46 @@ public class MainActivity extends AppCompatActivity {
                 // TODO Auto-generated method stub
 
                 NetwordDetect();
+                if (IPaddress.equals("")){
+                    t1.setText("Currently You are not connected to any network!!\nNo Internet connection.");
+                }else {
+                    if (validate(IPaddress) ){
+                        String new_ipaddress = IPaddress;
+                        String[] arr=NewActivity.new_split(new_ipaddress);
+                        int l =  arr.length;
+                        int[] ints=new int[arr.length];
+                        for(int i=0;i<arr.length;i++)
+                        {
+                            ints[i]=Integer.parseInt(arr[i]);
+
+                        }
+                        int set_cidr=NewActivity.setCidr(ints);
+                        IPv4 ipv4 = new IPv4(new_ipaddress+"/"+Integer.toString(set_cidr));
+                        NetworkInfo ni = new NetworkInfo();
+
+                        if (ni.isAvailable()){
+                            t1.setText("IP Address is "+IPaddress);
+                        }else{
+                            t1.setText("Oops..!!!There is No Internet Connection" + "\n"+"IP Address is "+IPaddress);
+                        }
+
+                        //t2.setText("Sub Net Mask:" + ipv4.getNetmask() +"\n"+"BroadCast Address:"+ipv4.getBroadcastAddress()+ "\n");
+                        t2.setText("Sub Net Mask:" + ipv4.getNetmask() + "\n"+"Broadcast Address :"+ipv4.getBroadcastAddress()+"\n"+"Classs of the Address : "+NewActivity.findClass(ints)+"\n");
+                    }else if (validate2(IPaddress)) {
+                        String new_ipaddress = IPaddress+"/"+64;
+                        IPv6Network strangeNetwork = IPv6Network.fromString(new_ipaddress);
+                        if (isNetworkAvailable()){
+                            t1.setText("IP Address is "+IPaddress);
+                        }else{
+                            t1.setText("Oops..!!!There is No Internet Connection" + "\n"+"IP Address is "+IPaddress);
+                        }
+
+                        t2.setText("Sub Net Mask:" + strangeNetwork.getNetmask().asAddress() + "\n");
+
+                    }
+                }
+
+
 
             }
         });
@@ -97,7 +156,7 @@ public class MainActivity extends AppCompatActivity {
 
         {
             IPaddress = GetDeviceipWiFiData();
-            t1.setText(IPaddress);
+
 
 
         }
@@ -106,8 +165,11 @@ public class MainActivity extends AppCompatActivity {
         {
 
             IPaddress = GetDeviceipMobileData();
-            t1.setText(IPaddress);
 
+
+        }
+        if (WIFI== false && MOBILE== false){
+            IPaddress = "";
         }
 
     }
@@ -130,7 +192,12 @@ public class MainActivity extends AppCompatActivity {
         }
         return null;
     }
-
+    public boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager
+                = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+    }
     public String GetDeviceipWiFiData()
     {
 
@@ -143,10 +210,11 @@ public class MainActivity extends AppCompatActivity {
         return ip;
 
     }
-
+    public static boolean validate( String ip) {
+        return PATTERN.matcher(ip).matches();
+    }
+    public static boolean validate2( String ip){return PATTERN2.matcher(ip).matches();}
 
 
 
 }
-
-

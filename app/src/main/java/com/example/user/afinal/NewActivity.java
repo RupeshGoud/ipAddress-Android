@@ -50,7 +50,7 @@ public class NewActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.new_activity);
         b4=(Button)findViewById(R.id.button4);
-      //  b5=(Button)findViewById(R.id.button5);
+        //  b5=(Button)findViewById(R.id.button5);
         e5=(EditText)findViewById(R.id.editText);
         e6=(EditText)findViewById(R.id.editText2);
         t4=(TextView)findViewById(R.id.textView4);
@@ -61,103 +61,140 @@ public class NewActivity extends Activity {
             @Override
             public void onClick(View v) {
                 Log.d("enter","entered inside onclick");
-                if (r1.isChecked())
-                {
+                if (r1.isChecked()){
                     new_ipaddress=e5.getText().toString();
-                    Log.d("enter","entered inside onclick inside radio of ipv4");
-                    String[] arr=new_split(new_ipaddress);
-                    int l =  arr.length;
-                    Log.d("enter",Integer.toString(l));
-                    //Log.d("enter", );
-                    int[] ints=new int[arr.length];
-                    Log.d("enter","entered inside onclick inside radio of ipv4      2");
-                    for(int i=0;i<arr.length;i++)
-                    {
-                        ints[i]=Integer.parseInt(arr[i]);
-
-                    }
-                    Log.d("enter","entered inside onclick inside radio of ipv4       3");
-                    //int k=Integer.parseInt(e6.getText().toString());
-                    Log.d("ipv4s",e6.getText().toString());
-                    if((e6.getText().toString()).equals(""))
-                    {
-                        Log.d("enter","in e6(if)");
-                        int set_cidr=setCidr(ints);
-                        boolean x=  validate(e5.getText().toString());
-                        String sb=findSubNetMask(ints);
-                        String clas=findClass(ints);
-                        if(arr[0]=="0"||arr[0]=="127"||arr[0]=="255")
-                        {
-                            x=false;
+                    if(new_ipaddress.equals("")){
+                        t4.setText("Please enter the IPv4 Address.");
+                    }else {
+                        String[] arr=new_split(new_ipaddress);
+                        int l =  arr.length;
+                        Log.d("enter",Integer.toString(l));
+                        //Log.d("enter", );
+                        int[] ints=new int[arr.length];
+                        Log.d("enter","entered inside onclick inside radio of ipv4      2");
+                        for(int i=0;i<arr.length;i++){
+                            ints[i]=Integer.parseInt(arr[i]);
                         }
-                        if(x==true) {
-                            if (ints[0] >= 224 && ints[0] <= 239) {
+                        if((e6.getText().toString()).equals(""))
+                        {
+                            int set_cidr=setCidr(ints);
+                            boolean x=  validate(e5.getText().toString());
+                            String sb=findSubNetMask(ints);
+                            String clas=findClass(ints);
+                            if(arr[0]=="0"||arr[0]=="127"||arr[0]=="255")
+                            {
+                                x=false;
+                            }
+                            if(x==true) {
+                                if (ints[0] >= 224 && ints[0] <= 239) {
 
-                                Toast.makeText(NewActivity.this, "Reserved for Multicasting", Toast.LENGTH_SHORT).show();
-                            } else if (ints[0] >= 240 && ints[0] <= 254) {
-                                Toast.makeText(NewActivity.this, "Experimental.. Used for Research", Toast.LENGTH_SHORT).show();
-                            } else if (ints[0] == 10) {
-                                String sbn1111 = "255.0.0.0";
-                                Toast.makeText(NewActivity.this, "Private Network", Toast.LENGTH_SHORT).show();
-                                t4.setText("Sub Net Mask:" + sbn1111 + "\n");
-                            } else if (ints[0] == 172 && ints[1] >= 16 && ints[1] <= 31) {
-                                String sbn1111 = "255.240.0.0";
-                                Toast.makeText(NewActivity.this, "Private Network", Toast.LENGTH_SHORT).show();
-                                t4.setText("Sub Net Mask:" + sbn1111 + "\n");
-                            } else if (ints[0] == 192 && ints[1] == 168) {
-                                String sbn1111 = "255.255.0.0";
-                                Toast.makeText(NewActivity.this, "Private Network", Toast.LENGTH_SHORT).show();
-                                t4.setText("Sub Net Mask:" + sbn1111 + "\n");
-                            } else {
-                                String subNetMask = findSubNetMask(ints);
-                                String classOf = findClass(ints);
-                                Log.d("myTag1", "This is my message");
-                                Toast.makeText(NewActivity.this, "IP IS VALID", Toast.LENGTH_SHORT).show();
-                                t4.setText("Network Info\n" + subNetMask + "\n" + classOf + "\n");
+                                    Toast.makeText(NewActivity.this, "Reserved for Multicasting", Toast.LENGTH_SHORT).show();
+                                } else if (ints[0] >= 240 && ints[0] <= 254) {
+                                    Toast.makeText(NewActivity.this, "Experimental.. Used for Research", Toast.LENGTH_SHORT).show();
+                                } else if (ints[0] == 10) {
+                                    String sbn1111 = "255.0.0.0";
+                                    Toast.makeText(NewActivity.this, "Private Network", Toast.LENGTH_SHORT).show();
+                                    t4.setText("Sub Net Mask:" + sbn1111 + "\n");
+                                } else if (ints[0] == 172 && ints[1] >= 16 && ints[1] <= 31) {
+                                    String sbn1111 = "255.240.0.0";
+                                    Toast.makeText(NewActivity.this, "Private Network", Toast.LENGTH_SHORT).show();
+                                    t4.setText("Sub Net Mask:" + sbn1111 + "\n");
+                                } else if (ints[0] == 192 && ints[1] == 168) {
+                                    String sbn1111 = "255.255.0.0";
+                                    Toast.makeText(NewActivity.this, "Private Network", Toast.LENGTH_SHORT).show();
+                                    t4.setText("Sub Net Mask:" + sbn1111 + "\n");
+                                } else if (ints[0] == 127) {
+                                    Toast.makeText(NewActivity.this, "Loopback Address", Toast.LENGTH_SHORT).show();
+                                    t4.setText("Loopback Address");
+                                } else {
+                                    // String subNetMask = findSubNetMask(ints);
+                                    // String classOf = findClass(ints);
+                                    // Log.d("myTag1", "This is my message");
+                                    // Toast.makeText(NewActivity.this, "IP IS VALID", Toast.LENGTH_SHORT).show();
+                                    // t4.setText("Network Info\n" + subNetMask + "\n" + classOf + "\n");
 
+
+                                    IPv4 ipv4 = new IPv4(new_ipaddress+"/"+Integer.toString(set_cidr));
+                                    t4.setText("Sub Net Mask: " + ipv4.getNetmask() + "\n"+"Broadcast Address : "+ipv4.getBroadcastAddress()+"\n"+"Classs of the Address : "+findClass(ints)+"\n");
+
+                                }
+                            }else{ //rp
+                                t4.setText("The IPv4 Address you have entered is Incorrect");
+                            }
+
+                        }
+                        else{
+                            boolean x=  validate(e5.getText().toString());
+                            if(arr[0]=="0"||arr[0]=="255"){
+                                x=false;
+                            }
+                            if(x==true) {
+                                if (ints[0] >= 224 && ints[0] <= 239) {
+                                    Toast.makeText(NewActivity.this, "Reserved for Multicasting", Toast.LENGTH_SHORT).show();
+                                    t4.setText("Entered IPv4 Address is Reserved for Multicasting \n");
+                                } else if (ints[0] >= 240 && ints[0] <= 254) {
+                                    Toast.makeText(NewActivity.this, "Experimental.. Used for Research", Toast.LENGTH_SHORT).show();
+                                    t4.setText("Entered IPv4 Address is given for Experimental puropse...Used for Research \n");
+                                } else if (ints[0] == 10) {
+                                    String sbn1111 = "255.0.0.0";
+                                    Toast.makeText(NewActivity.this, "Private Network", Toast.LENGTH_SHORT).show();
+                                    t4.setText("Sub Net Mask:" + sbn1111 + "\n");
+                                } else if (ints[0] == 172 && ints[1] >= 16 && ints[1] <= 31) {
+                                    String sbn1111 = "255.240.0.0";
+                                    Toast.makeText(NewActivity.this, "Private Network", Toast.LENGTH_SHORT).show();
+                                    t4.setText("Sub Net Mask:" + sbn1111 + "\n");
+                                } else if (ints[0] == 192 && ints[1] == 168) {
+                                    String sbn1111 = "255.255.0.0";
+                                    Toast.makeText(NewActivity.this, "Private Network", Toast.LENGTH_SHORT).show();
+                                    t4.setText("Sub Net Mask:" + sbn1111 + "\n");
+                                }else if (ints[0] == 127) {
+                                    Toast.makeText(NewActivity.this, "Loopback Address", Toast.LENGTH_SHORT).show();
+                                    t4.setText("Loopback Address");
+                                } else {
+                                    if((Integer.parseInt(e6.getText().toString()) < 10 || (Integer.parseInt(e6.getText().toString())) >30)){
+                                        Toast.makeText(NewActivity.this, "Please enter beteen 10-30", Toast.LENGTH_SHORT).show();
+                                    }else{
+                                        IPv4 ipv4 = new IPv4(new_ipaddress+"/"+e6.getText().toString());
+                                        t4.setText("Sub Net Mask:" + ipv4.getNetmask() + "\n");
+                                        Toast.makeText(NewActivity.this, "Correct cidr", Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+                            }else{ //rp
+                                t4.setText("The IPv4 Address you have entered is Incorrect");
                             }
                         }
-
                     }
-                    else{
-                        if((Integer.parseInt(e6.getText().toString()) < 10 || (Integer.parseInt(e6.getText().toString())) >30)){
-                            Toast.makeText(NewActivity.this, "Please enter beteen 10-30", Toast.LENGTH_SHORT).show();
-
-                        }else{
-                            IPv4 ipv4 = new IPv4(new_ipaddress+"/"+e6.getText().toString());
-                            t4.setText("Sub Net Mask:" + ipv4.getNetmask() + "\n");
-                            Toast.makeText(NewActivity.this, "Correct cidr", Toast.LENGTH_SHORT).show();
-                        }
-
-                    }
-
 
                 }
                 else if(r2.isChecked()) {
-                    if ((e6.getText().toString()).equals("")) {
-                        boolean y = validate2(e5.getText().toString());
-                        if (y == true) {
-                            new_ipaddress = e5.getText().toString()+"/"+64;
-                            IPv6Network strangeNetwork = IPv6Network.fromString(new_ipaddress);
-                            Toast.makeText(NewActivity.this, "Given IPV6 Address is valid", Toast.LENGTH_SHORT).show();
-                            t4.setText("Sub Net Mask:" + strangeNetwork.getNetmask().asAddress() + "\n");
+                    if (e5.getText().toString().equals("")){
+                        t4.setText("Please enter the IPv6 Address");
+                    }else {
+                        if ((e6.getText().toString()).equals("")) {
+                            boolean y = validate2(e5.getText().toString());
+                            if (y == true) {
+                                new_ipaddress = e5.getText().toString()+"/"+64;
+                                IPv6Network strangeNetwork = IPv6Network.fromString(new_ipaddress);
+                                Toast.makeText(NewActivity.this, "Given IPV6 Address is valid", Toast.LENGTH_SHORT).show();
+                                t4.setText("Sub Net Mask:" + strangeNetwork.getNetmask().asAddress() + "\n");
 
-                        } else {
-                            Toast.makeText(NewActivity.this, "Given IPV6 Address is not valid", Toast.LENGTH_SHORT).show();
+                            } else {
+                                Toast.makeText(NewActivity.this, "Given IPV6 Address is not valid", Toast.LENGTH_SHORT).show();
+                            }
                         }
-                    }
-                    else {
-                        if((Integer.parseInt(e6.getText().toString()) <  64)) {
-                            t4.setText("Please enter cidr greater than 64\n");
-                            Toast.makeText(NewActivity.this, "Please enter greater than 64", Toast.LENGTH_SHORT).show();
-                        }
-                        else{
-                            new_ipaddress = e5.getText().toString()+"/"+Integer.parseInt(e6.getText().toString());
-                            IPv6Network strangeNetwork = IPv6Network.fromString(new_ipaddress);
-                            t4.setText("Sub Net Mask:" + strangeNetwork.getNetmask().asAddress() + "\n");
-                            Toast.makeText(NewActivity.this, "Correct cidr", Toast.LENGTH_SHORT).show();
-                        }
+                        else {
+                            if((Integer.parseInt(e6.getText().toString()) <  64)) {
+                                t4.setText("Please enter cidr greater than 64\n");
+                                Toast.makeText(NewActivity.this, "Please enter greater than 64", Toast.LENGTH_SHORT).show();
+                            }
+                            else{
+                                new_ipaddress = e5.getText().toString()+"/"+Integer.parseInt(e6.getText().toString());
+                                IPv6Network strangeNetwork = IPv6Network.fromString(new_ipaddress);
+                                t4.setText("Sub Net Mask:" + strangeNetwork.getNetmask().asAddress() + "\n");
+                                Toast.makeText(NewActivity.this, "Correct cidr", Toast.LENGTH_SHORT).show();
+                            }
 
+                        }
                     }
                 }
             }
@@ -165,7 +202,7 @@ public class NewActivity extends Activity {
 
 
     }
-    public String[] new_split(String ipaddress_1)
+    public static String[] new_split(String ipaddress_1)
     {
 
         String temp=ipaddress_1;
@@ -181,16 +218,16 @@ public class NewActivity extends Activity {
         return ipadd;
 
     }
-    public int setCidr(int sbnm[])
+    public static int setCidr(int sbnm[])
     {
         int cidrr=0;
-        if(sbnm[0]>=1&&sbnm[0]<=168)
+        if(sbnm[0]>=1&&sbnm[0]<=126)
         {
-          cidrr=8;
+            cidrr=8;
         }
         if(sbnm[0]>=128&&sbnm[0]<=191)
         {
-           cidrr=16;
+            cidrr=16;
         }
         if(sbnm[0]>=192&&sbnm[0]<=223)
         {
@@ -228,10 +265,10 @@ public class NewActivity extends Activity {
         return sbn;
 
     }
-    public String findClass(int sbnm1[])
+    public static String findClass(int sbnm1[])
     {
         String cla1="";
-        if(sbnm1[0]>=1&&sbnm1[0]<=168)
+        if(sbnm1[0]>=1&&sbnm1[0]<=126)
         {
             cla1="A";
         }
